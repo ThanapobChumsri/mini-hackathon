@@ -1,0 +1,8 @@
+.disabled\:opacity-75:disabled {
+    opacity: 0.50
+}
+.validate-input > :not(:has(p.mt-2.text-red-500)):nth-child(2)::after {
+    content: ' ';
+    min-height: 22px;
+    display: inline-block;
+}
