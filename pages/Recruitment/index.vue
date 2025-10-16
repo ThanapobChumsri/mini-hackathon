@@ -1,6 +1,8 @@
 <template>
   <div class="min-h-screen bg-[#eef2f9]">
-    <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 py-10 px-4 md:px-10">
+    <div
+      class="mx-auto flex w-full max-w-6xl flex-col gap-6 py-10 px-4 md:px-10"
+    >
       <div class="flex items-center gap-3">
         <button
           type="button"
@@ -22,18 +24,23 @@
         >
           <header class="mb-8 flex items-center justify-between">
             <h1 class="text-2xl font-semibold text-[#1f2a44]">Create Job</h1>
-            <span class="text-xs font-medium uppercase text-[#9aa4bf]">Step 1 of 2</span>
+            <span class="text-xs font-medium uppercase text-[#9aa4bf]"
+              >Step 1 of 2</span
+            >
           </header>
 
           <div class="space-y-10">
             <div class="space-y-4">
-              <h2 class="text-sm font-semibold uppercase tracking-wide text-[#7a87a6]">Information</h2>
+              <h2
+                class="text-sm font-semibold uppercase tracking-wide text-[#7a87a6]"
+              >
+                Information
+              </h2>
               <div class="rounded-3xl border border-[#e6ebf8] bg-[#f8f9ff] p-6">
-                <label class="flex flex-col gap-2 text-sm font-medium text-[#4b5c7c]">
-                    <div>
-                  Job Name<span class="text-red-500">*</span>
-
-                    </div>
+                <label
+                  class="flex flex-col gap-2 text-sm font-medium text-[#4b5c7c]"
+                >
+                  <div>Job Name<span class="text-red-500">*</span></div>
                   <UInput
                     v-model="form.position"
                     placeholder="Senior Back-End Developer"
@@ -46,7 +53,11 @@
 
             <div class="space-y-6">
               <div class="flex items-center justify-between">
-                <h2 class="text-sm font-semibold uppercase tracking-wide text-[#7a87a6]">Criteria</h2>
+                <h2
+                  class="text-sm font-semibold uppercase tracking-wide text-[#7a87a6]"
+                >
+                  Criteria
+                </h2>
               </div>
 
               <div class="space-y-6">
@@ -55,7 +66,9 @@
                   :key="item.id"
                   class="rounded-3xl border border-[#e6ebf8] bg-[#f8f9ff] p-6"
                 >
-                  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div
+                    class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+                  >
                     <label class="flex-1 text-sm font-medium text-[#4b5c7c]">
                       {{ item.title }}<span class="text-red-500">*</span>
                       <UInput
@@ -66,7 +79,9 @@
                       />
                     </label>
                     <div class="flex items-center gap-3">
-                      <span class="text-sm font-semibold text-[#7a87a6]">Mandatory</span>
+                      <span class="text-sm font-semibold text-[#7a87a6]"
+                        >Mandatory</span
+                      >
                       <UToggle v-model="item.mandatory" color="primary" />
                     </div>
                   </div>
@@ -75,7 +90,9 @@
             </div>
           </div>
 
-          <p v-if="errorMessage" class="mt-6 text-sm text-red-500">{{ errorMessage }}</p>
+          <p v-if="errorMessage" class="mt-6 text-sm text-red-500">
+            {{ errorMessage }}
+          </p>
 
           <div class="mt-10 flex justify-end gap-3">
             <UButton
@@ -103,59 +120,86 @@
           class="rounded-[28px] border border-[#e0e6f4] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.05)] md:p-10 space-y-8"
         >
           <header>
-        
-            <h1
-             class="text-2xl font-semibold text-[#1f2a44]">Upload Resume</h1>
+            <h1 class="text-2xl font-semibold text-[#1f2a44]">Upload Resume</h1>
           </header>
 
-          <div class="rounded-3xl border border-dashed border-[#d0daf5] bg-[#f7f9ff] px-6 py-12">
-            <div class="flex flex-col items-center justify-center gap-4 text-center">
-              <Dnd ui-type="2" />
+          <div
+            class="rounded-3xl border border-dashed border-[#d0daf5] bg-[#f7f9ff] px-6 py-12"
+          >
+            <div
+              class="flex flex-col items-center justify-center gap-4 text-center"
+            >
+              <Dnd :key="uploaderKey" ui-type="2" @upload="handleUpload" />
               <p class="text-xs text-[#9aa4bf]">
-                Support for a single or bulk upload. Strictly prohibit from uploading company data or other banned files.
+                Support for a single or bulk upload. Strictly prohibit from
+                uploading company data or other banned files.
               </p>
             </div>
           </div>
 
           <div>
-            <h2 class="mb-3 text-sm font-semibold text-[#4b5c7c]">Uploaded list</h2>
+            <div class="mb-3">
+              <div
+                class="flex items-center justify-between text-sm font-semibold text-[#4b5c7c]"
+              >
+                <span>Uploaded list</span>
+                <span class="text-xs font-normal text-[#7a87a6]">
+                  {{ uploadedFiles.length }} file{{
+                    uploadedFiles.length !== 1 ? "s" : ""
+                  }}
+                </span>
+              </div>
+            </div>
 
-            <div class="overflow-hidden rounded-3xl border border-[#e6ebf8]">
+            <div
+              v-if="uploadedFiles.length"
+              class="overflow-hidden rounded-3xl border border-[#e6ebf8]"
+            >
               <table class="min-w-full divide-y divide-[#e6ebf8]">
-                <thead class="bg-[#f8f9ff] text-left text-xs font-semibold uppercase tracking-wider text-[#7a87a6]">
+                <thead
+                  class="bg-[#f8f9ff] text-left text-xs font-semibold uppercase tracking-wider text-[#7a87a6]"
+                >
                   <tr>
                     <th class="px-6 py-4">Action</th>
                     <th class="px-4 py-4">File Name</th>
-                    <th class="px-4 py-4">Processed on</th>
-                    <th class="px-4 py-4 text-right">Status</th>
+                    <th class="px-4 py-4">Uploaded on</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-[#eef1fb] bg-white text-sm text-[#2f3c5a]">
-                  <tr v-for="file in uploadedFiles" :key="file.id" class="transition hover:bg-[#f4f6ff]">
+                <tbody
+                  class="divide-y divide-[#eef1fb] bg-white text-sm text-[#2f3c5a]"
+                >
+                  <tr
+                    v-for="file in uploadedFiles"
+                    :key="file.id"
+                    class="transition hover:bg-[#f4f6ff]"
+                  >
                     <td class="px-6 py-4">
                       <button
                         type="button"
                         class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f87171] text-white shadow-[0_10px_20px_rgba(248,113,113,0.25)]"
-                      >
-                        <UIcon name="i-heroicons-trash-16-solid" class="h-4 w-4" />
-                      </button>
-                    </td>
-                    <td class="px-4 py-4 font-medium">{{ file.name }}</td>
-                    <td class="px-4 py-4 text-[#66759a]">{{ file.processedOn }}</td>
-                    <td class="px-4 py-4 text-right">
-                      <span
-                        class="inline-flex h-6 w-6 items-center justify-center rounded-full"
-                        :class="file.status === 'success' ? 'bg-[#e6f8e6] text-[#2a6a2a]' : 'bg-[#fee2e2] text-[#b91c1c]'"
+                        @click="removeUploadedFile(file.id)"
                       >
                         <UIcon
-                          :name="file.status === 'success' ? 'i-heroicons-check-16-solid' : 'i-heroicons-x-mark-16-solid'"
+                          name="i-heroicons-trash-16-solid"
                           class="h-4 w-4"
                         />
-                      </span>
+                      </button>
+                    </td>
+                    <td class="px-4 py-4 font-medium truncate max-w-[240px]">
+                      {{ file.name }}
+                    </td>
+                    <td class="px-4 py-4 text-[#66759a]">
+                      {{ file.uploadedOn }}
                     </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <div
+              v-else
+              class="rounded-3xl border border-dashed border-[#dbe2f3] bg-white py-10 text-center text-sm text-[#9aa4bf]"
+            >
+              No files uploaded yet.
             </div>
           </div>
 
@@ -184,12 +228,16 @@
           key="applicants"
           class="rounded-[28px] border border-[#e0e6f4] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.05)] md:p-8"
         >
-          <header class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <header
+            class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+          >
             <div>
               <h1 class="text-xl font-semibold text-[#1f2a44]">
                 {{ form.position }} Applicants
               </h1>
-              <p class="text-sm text-[#7a87a6]">Compare candidate resumes against your selected criteria.</p>
+              <p class="text-sm text-[#7a87a6]">
+                Compare candidate resumes against your selected criteria.
+              </p>
             </div>
             <div class="flex items-center gap-2">
               <button
@@ -203,7 +251,10 @@
                 type="button"
                 class="inline-flex items-center gap-2 rounded-full border border-[#dbe3f6] bg-white px-4 py-2 text-xs font-semibold text-[#4b5c7c] transition hover:bg-[#f3f6ff]"
               >
-                <UIcon name="i-heroicons-bars-arrow-down-20-solid" class="h-4 w-4" />
+                <UIcon
+                  name="i-heroicons-bars-arrow-down-20-solid"
+                  class="h-4 w-4"
+                />
                 Sort
               </button>
               <button
@@ -216,7 +267,9 @@
             </div>
           </header>
 
-          <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div
+            class="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+          >
             <div class="flex items-center gap-3">
               <div class="relative">
                 <UIcon
@@ -231,23 +284,30 @@
                 />
               </div>
               <button
-              @click="activeView = 'upload'"
+                @click="activeView = 'upload'"
                 type="button"
                 class="inline-flex items-center gap-2 rounded-full border border-[#dbe3f6] bg-white px-4 py-2 text-xs font-semibold text-[#4b5c7c] transition hover:bg-[#f3f6ff]"
               >
-                <UIcon name="i-heroicons-document-arrow-up-20-solid" class="h-4 w-4" />
+                <UIcon
+                  name="i-heroicons-document-arrow-up-20-solid"
+                  class="h-4 w-4"
+                />
                 Upload Resume
               </button>
             </div>
-           
           </div>
 
           <div class="overflow-hidden rounded-3xl border border-[#e6ebf8]">
             <table class="min-w-full divide-y divide-[#e6ebf8]">
-              <thead class="bg-[#f8f9ff] text-left text-xs font-semibold uppercase tracking-wider text-[#7a87a6]">
+              <thead
+                class="bg-[#f8f9ff] text-left text-xs font-semibold uppercase tracking-wider text-[#7a87a6]"
+              >
                 <tr>
                   <th class="px-6 py-4">
-                    <input type="checkbox" class="h-4 w-4 rounded border-[#ccd5ea] text-[#4b7ee8] focus:ring-[#4b7ee8]" />
+                    <input
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-[#ccd5ea] text-[#4b7ee8] focus:ring-[#4b7ee8]"
+                    />
                   </th>
                   <th class="px-4 py-4">Name</th>
                   <th class="px-4 py-4">Current Role</th>
@@ -257,14 +317,19 @@
                   <th class="px-4 py-4 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#eef1fb] bg-white text-sm text-[#2f3c5a]">
+              <tbody
+                class="divide-y divide-[#eef1fb] bg-white text-sm text-[#2f3c5a]"
+              >
                 <tr
                   v-for="applicant in filteredApplicants"
                   :key="applicant.id"
                   class="transition hover:bg-[#f4f6ff]"
                 >
                   <td class="px-6 py-4">
-                    <input type="checkbox" class="h-4 w-4 rounded border-[#ccd5ea] text-[#4b7ee8] focus:ring-[#4b7ee8]" />
+                    <input
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-[#ccd5ea] text-[#4b7ee8] focus:ring-[#4b7ee8]"
+                    />
                   </td>
                   <td class="px-4 py-4">
                     <div class="flex items-center gap-3">
@@ -272,11 +337,18 @@
                         type="button"
                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#4b7ee8] text-white shadow-[0_10px_20px_rgba(75,126,232,0.25)]"
                       >
-                        <UIcon name="i-heroicons-user-group-16-solid" class="h-4 w-4" />
+                        <UIcon
+                          name="i-heroicons-user-group-16-solid"
+                          class="h-4 w-4"
+                        />
                       </button>
                       <div>
-                        <p class="font-semibold text-[#1f2a44]">{{ applicant.name }}</p>
-                        <p class="text-xs text-[#7a87a6]">{{ applicant.company }}</p>
+                        <p class="font-semibold text-[#1f2a44]">
+                          {{ applicant.name }}
+                        </p>
+                        <p class="text-xs text-[#7a87a6]">
+                          {{ applicant.company }}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -303,7 +375,9 @@
                       ></span>
                     </div>
                   </td>
-                  <td class="px-4 py-4 text-right text-lg font-semibold text-[#1f2a44]">
+                  <td
+                    class="px-4 py-4 text-right text-lg font-semibold text-[#1f2a44]"
+                  >
                     {{ applicant.score }}
                   </td>
                   <td class="px-4 py-4 text-right">
@@ -370,18 +444,48 @@ const criteria = reactive([
   },
 ]);
 
-const uploadedFiles = [
-  { id: 1, name: "resume2024.pdf", processedOn: "10/10/2025 04:05 pm", status: "success" },
-  { id: 2, name: "johndoeresume.pdf", processedOn: "11/11/2025 09:15 am", status: "success" },
-  { id: 3, name: "resume2025.pdf", processedOn: "12/12/2025 02:30 pm", status: "fail" },
-  { id: 4, name: "janesmith_resume.pdf", processedOn: "01/01/2026 08:00 am", status: "fail" },
-  { id: 5, name: "resume.pdf", processedOn: "02/02/2026 11:45 am", status: "fail" },
-  { id: 6, name: "jenny_resume.pdf", processedOn: "03/03/2026 03:20 pm", status: "fail" },
-  { id: 7, name: "mark_resume.pdf", processedOn: "04/04/2026 01:10 pm", status: "fail" },
-  { id: 8, name: "suesmith_cv.pdf", processedOn: "05/05/2026 07:55 am", status: "fail" },
-  { id: 9, name: "cv_samantha.pdf", processedOn: "06/06/2026 10:25 am", status: "fail" },
-  { id: 10, name: "cv2025_ken.pdf", processedOn: "07/07/2026 05:40 pm", status: "fail" },
-];
+const uploadedFiles = ref<
+  { id: number; name: string; uploadedOn: string; file: File }[]
+>([]);
+const uploaderKey = ref(0);
+
+const formatDateTime = (date: Date) =>
+  new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(date)
+    .replace(",", "");
+
+const handleUpload = (payload: { file?: File | null }) => {
+  if (payload?.file) {
+    const entryId = Date.now();
+    uploadedFiles.value = [
+      {
+        id: entryId,
+        name: payload.file.name,
+        uploadedOn: formatDateTime(new Date()),
+        file: payload.file,
+      },
+      ...uploadedFiles.value,
+    ];
+  } else {
+    uploadedFiles.value = [];
+  }
+
+  uploaderKey.value += 1;
+};
+
+const removeUploadedFile = (id: number) => {
+  uploadedFiles.value = uploadedFiles.value.filter((file) => file.id !== id);
+  if (!uploadedFiles.value.length) {
+    uploaderKey.value += 1;
+  }
+};
 
 const applicants = [
   {
@@ -399,8 +503,16 @@ const applicants = [
       { id: "cloud", status: "pass", note: "AWS expertise proven" },
     ],
     preferred: [
-      { id: "design", status: "warning", note: "Limited design system exposure" },
-      { id: "tailwind", status: "pass", note: "Tailwind used in recent project" },
+      {
+        id: "design",
+        status: "warning",
+        note: "Limited design system exposure",
+      },
+      {
+        id: "tailwind",
+        status: "pass",
+        note: "Tailwind used in recent project",
+      },
       { id: "nuxt", status: "pass", note: "Nuxt 3 production experience" },
     ],
   },
@@ -419,7 +531,11 @@ const applicants = [
       { id: "cloud", status: "pass", note: "AWS certified" },
     ],
     preferred: [
-      { id: "design", status: "pass", note: "Collaborated with design systems" },
+      {
+        id: "design",
+        status: "pass",
+        note: "Collaborated with design systems",
+      },
       { id: "tailwind", status: "warning", note: "CSS utilities experience" },
       { id: "nuxt", status: "pass", note: "Nuxt SSR experience" },
     ],
@@ -637,7 +753,33 @@ const handleCreate = () => {
 };
 
 const goToApplicants = () => {
-  activeView.value = "applicants";
+  if (!uploadedFiles.value.length) {
+    alert("Please upload at least one resume before proceeding.");
+    return;
+  }
+
+  const criteriaPayload = criteria.map(({ id, title, value, mandatory }) => ({
+    id,
+    title,
+    value,
+    mandatory,
+  }));
+
+  const formData = new FormData();
+  uploadedFiles.value.forEach((file) => formData.append("files", file));
+  formData.append("criteria", JSON.stringify(criteriaPayload));
+
+  console.log("FormData ready", {
+    files: uploadedFiles.value.map((item) => item.file),
+    criteria: JSON.stringify({ ...criteriaPayload }),
+  });
+
+  // TODO: API call
+  
+  if (false) {
+    //TODO: set data to table
+    activeView.value = "applicants";
+  }
 };
 
 const filteredApplicants = computed(() => {
@@ -645,7 +787,9 @@ const filteredApplicants = computed(() => {
     return applicants;
   }
   const keyword = search.value.trim().toLowerCase();
-  return applicants.filter((candidate) => candidate.name.toLowerCase().includes(keyword));
+  return applicants.filter((candidate) =>
+    candidate.name.toLowerCase().includes(keyword)
+  );
 });
 </script>
 

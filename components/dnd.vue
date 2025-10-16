@@ -97,13 +97,13 @@ export default {
     },
     typeFile: {
       type: String,
-      default: 'image/*',
+      default: 'application/pdf',
     },
   },
   data() {
     return {
       formData: {
-        file: '',
+        file: null,
       },
       isDragging: false,
       previewFile: '',
@@ -120,8 +120,6 @@ export default {
       const fileInput = e.target
 
       const allowedTypes = this.typeFile?.split(',').map((type) => type.trim())
-      console.log('Allowed Types:', allowedTypes)
-      console.log('File Type:', file.type)
 
       const maxFileSize = parseInt(this.limitSize) * 1024 * 1024
 
@@ -154,6 +152,7 @@ export default {
       }
 
       this.formData.file = file
+      this.fileName = file.name
 
       if (file.type === 'application/pdf') {
         this.previewFile =
@@ -188,8 +187,6 @@ export default {
 
       const file = files[0]
       const allowedTypes = this.typeFile?.split(',').map((type) => type.trim())
-      console.log('Allowed Types:', allowedTypes)
-      console.log('File Type:', file.type)
 
       const maxFileSize = parseInt(this.limitSize) * 1024 * 1024 // 300MB
 
@@ -233,12 +230,23 @@ export default {
     },
 
     deleteFile() {
-      this.formData.file = ''
+      this.formData.file = null
       this.previewFile = ''
+      this.fileName = ''
       this.$emit('test', this.formData.file, this.previewFile)
+      this.$emit('upload', {
+        file: this.formData.file || null,
+        preview: this.previewFile,
+        name: this.fileName || this.formData.file?.name || '',
+      })
     },
     emitTestEvent() {
       this.$emit('test', this.formData.file, this.previewFile)
+      this.$emit('upload', {
+        file: this.formData.file || null,
+        preview: this.previewFile,
+        name: this.fileName || this.formData.file?.name || '',
+      })
     },
 
     selectFiles2() {
@@ -253,8 +261,6 @@ export default {
       }
 
       const allowedTypes = this.typeFile?.split(',').map((type) => type.trim())
-      console.log('Allowed Types:', allowedTypes)
-      console.log('File Type:', file.type)
 
       const maxFileSize = parseInt(this.limitSize) * 1024 * 1024 // 300MB
 
@@ -321,8 +327,6 @@ onDrop2(e) {
   }
 
   const allowedTypes = this.typeFile?.split(',').map((type) => type.trim());
-  console.log('Allowed Types:', allowedTypes);
-  console.log('File Type:', file.type);
 
   const maxFileSize = parseInt(this.limitSize) * 1024 * 1024; // 300MB
 
@@ -352,6 +356,7 @@ onDrop2(e) {
   }
 
   this.formData.file = file;
+  this.fileName = file.name;
 
   // Set preview for specific file types
   if (file.type === 'application/pdf') {
@@ -365,12 +370,24 @@ onDrop2(e) {
 
 
     deleteFile2() {
-      this.formData.file = ''
+      this.formData.file = null
       this.previewFile = ''
+      this.fileName = ''
+      this.$emit('test', this.formData.file, this.previewFile, this.fileName)
+      this.$emit('upload', {
+        file: this.formData.file || null,
+        preview: this.previewFile,
+        name: this.fileName || this.formData.file?.name || '',
+      })
     },
 
     emitTestEvent2() {
       this.$emit('test', this.formData.file, this.previewFile, this.fileName)
+      this.$emit('upload', {
+        file: this.formData.file || null,
+        preview: this.previewFile,
+        name: this.fileName || this.formData.file?.name || '',
+      })
     },
   },
 }
