@@ -103,7 +103,9 @@
           class="rounded-[28px] border border-[#e0e6f4] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.05)] md:p-10 space-y-8"
         >
           <header>
-            <h1 class="text-2xl font-semibold text-[#1f2a44]">Upload Resume</h1>
+        
+            <h1
+             class="text-2xl font-semibold text-[#1f2a44]">Upload Resume</h1>
           </header>
 
           <div class="rounded-3xl border border-dashed border-[#d0daf5] bg-[#f7f9ff] px-6 py-12">
@@ -164,7 +166,7 @@
               class="rounded-full border border-[#dfe4f3] px-6 text-[#4b5c7c]"
               @click="handleBack"
             >
-              Back and Resume Upload
+              Back
             </UButton>
             <UButton
               size="md"
@@ -229,6 +231,7 @@
                 />
               </div>
               <button
+              @click="activeView = 'upload'"
                 type="button"
                 class="inline-flex items-center gap-2 rounded-full border border-[#dbe3f6] bg-white px-4 py-2 text-xs font-semibold text-[#4b5c7c] transition hover:bg-[#f3f6ff]"
               >
@@ -236,11 +239,7 @@
                 Upload Resume
               </button>
             </div>
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-[#4b7ee8] text-sm font-semibold text-white"
-            >
-              T
-            </div>
+           
           </div>
 
           <div class="overflow-hidden rounded-3xl border border-[#e6ebf8]">

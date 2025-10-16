@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-[#eef2f9] flex">
+  <div>
+
+  <div v-if="!switchpage" class="min-h-screen bg-[#eef2f9] flex">
     
 
     <main class="flex-1 px-4 py-10 md:px-10">
@@ -9,14 +11,25 @@
             <h1 class="text-2xl font-semibold text-[#1f2a44]">Jobs</h1>
             <p class="text-sm text-[#7a87a6]">Manage open roles and applicant pipelines.</p>
           </div>
-          <button
+          <div >
+
+          <button 
             type="button"
             class="inline-flex items-center gap-2 rounded-full bg-[#4b7ee8] px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(75,126,232,0.35)] transition hover:bg-[#3f6fd4]"
+            @click="switchpage = true"
+          >
+            <UIcon  name="i-heroicons-plus-20-solid" class="h-4 w-4" />
+            Dashboard
+          </button><button
+            type="button"
+            class="ml-4 inline-flex items-center gap-2 rounded-full bg-[#4b7ee8] px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(75,126,232,0.35)] transition hover:bg-[#3f6fd4]"
             @click="goToCreateJob"
           >
             <UIcon name="i-heroicons-plus-20-solid" class="h-4 w-4" />
             Create Job
           </button>
+          </div>
+
         </header>
 
         <section
@@ -113,11 +126,26 @@
       </div>
     </main>
   </div>
+  
+  <div class="px-10" v-else>
+    <button
+      @click="switchpage = false"
+      class="mt-4 mb-4 flex h-8 w-8 items-center justify-center rounded-lg bg-[#4b7ee8] text-white shadow-[0_10px_20px_rgba(75,126,232,0.25)]"
+    >
+      <UIcon name="i-heroicons-arrow-left-20-solid" class="h-4 w-4" />
+    </button>
+    <dashboard />
+  
+  </div>
+  
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import dashboard from "~/components/dashboard.vue";
+const switchpage = ref(false);
 
 const router = useRouter();
 const search = ref("");
