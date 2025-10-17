@@ -419,7 +419,7 @@ const criteria = reactive([
     title: "Working experience",
     placeholder: "5 years of experience",
     mandatory: true,
-    value: "5 years of experience",
+    value: 5,
   },
   {
     id: "skills",
@@ -442,12 +442,30 @@ const criteria = reactive([
     mandatory: true,
     value: "Based in Bangkok",
   },
-]);
+]) as Array<{
+  id: string;
+  title: string;
+  placeholder: string;
+  mandatory: boolean;
+  value: string | number;
+}>;
 
 const uploadedFiles = ref<
   { id: number; name: string; uploadedOn: string; file: File }[]
 >([]);
 const uploaderKey = ref(0);
+
+interface Applicant {
+  id: number;
+  name: string;
+  company: string;
+  role: string;
+  score: number;
+  state: string;
+  stateLabel: string;
+  mandatory: { id: string; status: string; note: string }[];
+  preferred: { id: string; status: string; note: string }[];
+}
 
 const formatDateTime = (date: Date) =>
   new Intl.DateTimeFormat("en-GB", {
@@ -487,7 +505,7 @@ const removeUploadedFile = (id: number) => {
   }
 };
 
-const applicants = [
+const applicants = ref([
   {
     id: 1,
     name: "Olivia Brown",
@@ -700,7 +718,7 @@ const applicants = [
       { id: "nuxt", status: "fail", note: "No Nuxt" },
     ],
   },
-];
+]);
 
 const statusPalette: Record<string, string> = {
   pass: "bg-[#7dd37d]",
@@ -752,7 +770,7 @@ const handleCreate = () => {
   activeView.value = "upload";
 };
 
-const goToApplicants = () => {
+const goToApplicants = async () => {
   if (!uploadedFiles.value.length) {
     alert("Please upload at least one resume before proceeding.");
     return;
@@ -766,28 +784,117 @@ const goToApplicants = () => {
   }));
 
   const formData = new FormData();
-  uploadedFiles.value.forEach((file) => formData.append("files", file));
-  formData.append("criteria", JSON.stringify(criteriaPayload));
+  uploadedFiles.value.forEach((item: { id: number; name: string; uploadedOn: string; file: File }) =>
+    formData.append("files", item.file)
+  );
+  console.log(criteriaPayload);
 
-  console.log("FormData ready", {
-    files: uploadedFiles.value.map((item) => item.file),
-    criteria: JSON.stringify({ ...criteriaPayload }),
-  });
+  const skillsValue = typeof criteria[1].value === 'string' ? criteria[1].value : String(criteria[1].value);
+  const additionalValue = typeof criteria[3].value === 'string' ? criteria[3].value : String(criteria[3].value);
 
-  // TODO: API call
-  
-  if (false) {
-    //TODO: set data to table
-    activeView.value = "applicants";
+  formData.append(
+    "criteria",
+    JSON.stringify({
+      title: form.position,
+      required_skills: skillsValue.split(","),
+      nice_to_have_skills: additionalValue.split(","),
+      min_years_experience: criteria[0].value,
+      required_degree: criteria[2].value,
+      location: "Bangkok",
+    })
+  );
+    // activeView.value = "applicants";
+  try {
+    const response: any = await $fetch(
+      "http://192.168.31.158:8000/task/upload_resumes",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    console.log("API Response:", response);
+
+    // Transform API response to applicants format
+    if (response.results && Array.isArray(response.results)) {
+      applicants.value = response.results.map((result: any, index: number) => {
+        const llm = result.llm_response;
+
+        // Calculate mandatory criteria status
+        const mandatory = [
+          {
+            id: "exp",
+            status: llm.years_of_experience && llm.years_of_experience >= criteria[0].value ? "pass" : "warning",
+            note: `${llm.years_of_experience || 0} years of experience`,
+          },
+          {
+            id: "skills",
+            status: "pass", // You can add logic to check skills match
+            note: llm.skills?.join(", ") || "No skills listed",
+          },
+          {
+            id: "degree",
+            status: llm.education && llm.education.length > 0 ? "pass" : "warning",
+            note: llm.education?.[0]?.degree || "No degree information",
+          },
+          {
+            id: "location",
+            status: llm.location ? "pass" : "warning",
+            note: llm.location || "Location not specified",
+          },
+        ];
+
+        // Calculate preferred criteria status
+        const preferred = [
+          {
+            id: "company",
+            status: llm.current_company ? "pass" : "warning",
+            note: llm.current_company || "No current company",
+          },
+        ];
+
+        // Calculate score (you can customize this logic)
+        const passCount = mandatory.filter((m) => m.status === "pass").length;
+        const score = Math.round((passCount / mandatory.length) * 100);
+
+        // Determine state based on score
+        let state = "archived";
+        let stateLabel = "Archived";
+        if (score >= 80) {
+          state = "advance";
+          stateLabel = "Advance";
+        } else if (score >= 60) {
+          state = "review";
+          stateLabel = "To Review";
+        }
+
+        return {
+          id: index + 1,
+          name: llm.full_name || "Unknown",
+          company: llm.current_company || "N/A",
+          role: llm.current_title || "N/A",
+          score,
+          state,
+          stateLabel,
+          mandatory,
+          preferred,
+        };
+      });
+    }
+
+  } catch (error) {
+
+    console.error("Error uploading resumes:", error);
+    alert("Failed to upload resumes. Please try again.");
   }
 };
 
 const filteredApplicants = computed(() => {
   if (!search.value.trim()) {
-    return applicants;
+    return applicants.value;
   }
   const keyword = search.value.trim().toLowerCase();
-  return applicants.filter((candidate) =>
+  return applicants.value.filter((candidate: Applicant) =>
     candidate.name.toLowerCase().includes(keyword)
   );
 });

@@ -75,7 +75,14 @@
             </div>
           </div>
 
-          <div class="overflow-hidden rounded-3xl border border-[#e6ebf8]">
+          <div v-if="isLoading" class="flex justify-center items-center py-20">
+            <div class="text-center">
+              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#4b7ee8] border-r-transparent"></div>
+              <p class="mt-4 text-sm text-[#7a87a6]">Loading jobs...</p>
+            </div>
+          </div>
+
+          <div v-else class="overflow-hidden rounded-3xl border border-[#e6ebf8]">
             <table class="min-w-full divide-y divide-[#e6ebf8]">
               <thead class="bg-[#f8f9ff] text-left text-xs font-semibold uppercase tracking-wider text-[#7a87a6]">
                 <tr>
@@ -89,6 +96,14 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#eef1fb] bg-white text-sm text-[#2f3c5a]">
+                <tr
+                  v-if="filteredJobs.length === 0"
+                  class="text-center"
+                >
+                  <td colspan="5" class="px-4 py-10 text-[#7a87a6]">
+                    No jobs found
+                  </td>
+                </tr>
                 <tr
                   v-for="job in filteredJobs"
                   :key="job.id"
@@ -142,13 +157,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import dashboard from "~/components/dashboard.vue";
-const switchpage = ref(false);
 
+const switchpage = ref(false);
 const router = useRouter();
 const search = ref("");
+const isLoading = ref(false);
 
 const sidebarItems = [
   { id: "dashboard", icon: "i-heroicons-home-20-solid" },
@@ -158,7 +174,14 @@ const sidebarItems = [
   { id: "settings", icon: "i-heroicons-cog-6-tooth-20-solid" },
 ];
 
-const jobs = [
+interface Job {
+  id: number | string;
+  name: string;
+  role: string;
+  totalApplicants: number;
+}
+
+const jobs = ref<Job[]>([
   { id: 1, name: "Senior Back-End Developer", role: "Senior", totalApplicants: 10 },
   { id: 2, name: "Junior Front-End Developer", role: "Junior", totalApplicants: 2 },
   { id: 3, name: "Lead Product Designer", role: "Lead", totalApplicants: 7 },
@@ -169,17 +192,56 @@ const jobs = [
   { id: 8, name: "Systems Architect", role: "Senior", totalApplicants: 12 },
   { id: 9, name: "Quality Assurance Tester", role: "Mid-Level", totalApplicants: 3 },
   { id: 10, name: "Technical Project Manager", role: "Senior", totalApplicants: 6 },
-];
+]);
+
+// Fetch jobs from API
+const fetchJobs = async () => {
+  isLoading.value = true;
+  try {
+    const response: any = await $fetch("http://192.168.31.158:8000/resumes/index", {
+      method: "GET",
+    });
+
+    console.log("API Response:", response);
+
+    // Transform API response to jobs format
+    if (response && Array.isArray(response)) {
+      jobs.value = response.map((item: any, index: number) => ({
+        id: item.id || index + 1,
+        name: item.title || item.name || "Untitled Job",
+        role: item.role || item.level || "N/A",
+        totalApplicants: item.total_applicants || item.applicants_count || 0,
+      }));
+    } else if (response.jobs && Array.isArray(response.jobs)) {
+      jobs.value = response.jobs.map((item: any, index: number) => ({
+        id: item.id || index + 1,
+        name: item.title || item.name || "Untitled Job",
+        role: item.role || item.level || "N/A",
+        totalApplicants: item.total_applicants || item.applicants_count || 0,
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    // Keep the default mock data if API fails
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const filteredJobs = computed(() => {
   if (!search.value.trim()) {
-    return jobs;
+    return jobs.value;
   }
   const keyword = search.value.trim().toLowerCase();
-  return jobs.filter((job) => job.name.toLowerCase().includes(keyword));
+  return jobs.value.filter((job: Job) => job.name.toLowerCase().includes(keyword));
 });
 
 const goToCreateJob = () => {
   router.push("/Recruitment");
 };
+
+// Fetch jobs when component is mounted
+onMounted(() => {
+  fetchJobs();
+});
 </script>
